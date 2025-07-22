@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { Typography, Upload, Button, message } from "antd";
+import { Typography, Upload, Button, message, Checkbox } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 const { Title, Paragraph, Text } = Typography;
 
@@ -61,11 +61,18 @@ const ResponseBox = styled.div`
   border-radius: 4px;
 `;
 
+const extractionOptions = [
+  "Quantity extraction for estimation",
+  "Quantity extraction for billing",
+  "Quantity extraction for material ordering",
+];
+
 const ConstructionQuantityExtractor = () => {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [response, setResponse] = useState<string>("");
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
   const handleBeforeUpload = (file: File) => {
     if (file.type !== "application/pdf") {
@@ -85,6 +92,7 @@ const ConstructionQuantityExtractor = () => {
 
     const formData = new FormData();
     formData.append("pdf", file);
+    formData.append("options", JSON.stringify(selectedOptions));
 
     try {
       setLoading(true);
@@ -96,7 +104,7 @@ const ConstructionQuantityExtractor = () => {
       if (!res.ok) throw new Error("Conversion failed");
 
       const data = await res.json();
-      setResponse(data.result); // ✅ show OpenAI’s answer
+      setResponse(data.result);
     } catch (error) {
       console.error(error);
       message.error("Upload failed.");
@@ -108,6 +116,15 @@ const ConstructionQuantityExtractor = () => {
   return (
     <UploadSection>
       <div style={{ flex: 2 }}>
+        <Title level={4} style={{ marginBottom: 16 }}>
+          Select extraction purpose(s):
+        </Title>
+        <Checkbox.Group
+          options={extractionOptions}
+          value={selectedOptions}
+          onChange={(list) => setSelectedOptions(list as string[])}
+          style={{ marginBottom: 24 }}
+        />
         <Title level={3}>Upload a PDF File</Title>
         <Paragraph>
           Select a PDF file to preview it and upload it to the server.

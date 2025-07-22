@@ -1,8 +1,9 @@
 import React from "react";
+import { Routes, Route } from "react-router-dom";
 import { Layout } from "antd";
 import styled from "styled-components";
 import logo from "./assets/logo.svg";
-import { MainOptions } from "./components";
+import { MainOptions, Page, ConstructionQuantityExtractor } from "./components";
 
 const { Header, Content, Footer } = Layout;
 
@@ -49,7 +50,17 @@ const MainPage: React.FC = () => {
       </StyledHeader>
 
       <StyledContent>
-        <MainOptions />
+        <Routes>
+          <Route path="/" element={<MainOptions />} />
+          <Route
+            path="/construction-quantity-extractor"
+            element={
+              <Page title="Construction Quantity Extractor">
+                <ConstructionQuantityExtractor />
+              </Page>
+            }
+          />
+        </Routes>
       </StyledContent>
 
       <StyledFooter>
