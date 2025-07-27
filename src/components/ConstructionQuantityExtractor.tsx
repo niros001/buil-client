@@ -8,7 +8,6 @@ import {
   Modal,
   Radio,
   Checkbox,
-  Table,
   Divider,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
@@ -63,12 +62,16 @@ const extractionOptions = [
   { label: "אומדן", value: "basic" },
   { label: "חשבון", value: "simple" },
   { label: "כמויות", value: "calculated" },
+  { label: "הזמנת חומרים", value: "order_material" },
 ];
 
-const elementOptions = Array.from({ length: 14 }, (_, i) => ({
-  label: `Option ${i}`,
-  value: i.toString(),
-}));
+const elementOptions = [
+  { label: "ריצוף", value: "01" },
+  ...Array.from({ length: 10 }, (_, i) => ({
+    label: `Option ${i}`,
+    value: i.toString(),
+  })),
+];
 
 const additionalOptions = Array.from({ length: 5 }, (_, i) => ({
   label: `Option ${i}`,
@@ -131,23 +134,23 @@ const ConstructionQuantityExtractor = () => {
       setLoading(false);
     }
   };
-
-  const columns =
-    tableData?.columns?.map((col: string, index: number) => ({
-      title: col,
-      dataIndex: `col_${index}`,
-      key: `col_${index}`,
-    })) || [];
-
-  const dataSource =
-    tableData?.rows?.map((row: string[], rowIndex: number) => {
-      const rowObj: any = { key: rowIndex };
-      row.forEach((cell, cellIndex) => {
-        rowObj[`col_${cellIndex}`] = cell;
-      });
-      return rowObj;
-    }) || [];
-
+  //
+  // const columns =
+  //   tableData?.columns?.map((col: string, index: number) => ({
+  //     title: col,
+  //     dataIndex: `col_${index}`,
+  //     key: `col_${index}`,
+  //   })) || [];
+  //
+  // const dataSource =
+  //   tableData?.rows?.map((row: string[], rowIndex: number) => {
+  //     const rowObj: any = { key: rowIndex };
+  //     row.forEach((cell, cellIndex) => {
+  //       rowObj[`col_${cellIndex}`] = cell;
+  //     });
+  //     return rowObj;
+  //   }) || [];
+  console.log({ tableData });
   return (
     <UploadSection>
       <Box>
@@ -222,7 +225,9 @@ const ConstructionQuantityExtractor = () => {
         footer={null}
         width="80%"
       >
-        <Table dataSource={dataSource} columns={columns} pagination={false} />
+        <pre style={{ whiteSpace: "normal" }}>
+          {JSON.stringify(tableData, null, 2)}
+        </pre>
       </Modal>
     </UploadSection>
   );
