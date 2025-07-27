@@ -40,39 +40,39 @@ const options = [
     title: "Construction Quantity Extractor",
     path: "/construction-quantity-extractor",
   },
-  {
-    title: "Material Cost Estimator",
-    path: "/construction-quantity-extractor",
-  },
-  {
-    title: "Blueprint Analyzer",
-    path: "/construction-quantity-extractor",
-  },
-  {
-    title: "Pipe Routing Visualizer",
-    path: "/construction-quantity-extractor",
-  },
-  {
-    title: "Electrical Load Calculator",
-    path: "/construction-quantity-extractor",
-  },
-  {
-    title: "HVAC Zone Mapper",
-    path: "/construction-quantity-extractor",
-  },
-  {
-    title: "Structural Integrity Checker",
-    path: "/construction-quantity-extractor",
-  },
-  {
-    title: "Plumbing Layout Tool",
-    path: "/construction-quantity-extractor",
-  },
-  { title: "3D Plan Preview", path: "/construction-quantity-extractor" },
-  {
-    title: "Environmental Compliance Checker",
-    path: "/construction-quantity-extractor",
-  },
+  // {
+  //   title: "Material Cost Estimator",
+  //   path: "/construction-quantity-extractor",
+  // },
+  // {
+  //   title: "Blueprint Analyzer",
+  //   path: "/construction-quantity-extractor",
+  // },
+  // {
+  //   title: "Pipe Routing Visualizer",
+  //   path: "/construction-quantity-extractor",
+  // },
+  // {
+  //   title: "Electrical Load Calculator",
+  //   path: "/construction-quantity-extractor",
+  // },
+  // {
+  //   title: "HVAC Zone Mapper",
+  //   path: "/construction-quantity-extractor",
+  // },
+  // {
+  //   title: "Structural Integrity Checker",
+  //   path: "/construction-quantity-extractor",
+  // },
+  // {
+  //   title: "Plumbing Layout Tool",
+  //   path: "/construction-quantity-extractor",
+  // },
+  // { title: "3D Plan Preview", path: "/construction-quantity-extractor" },
+  // {
+  //   title: "Environmental Compliance Checker",
+  //   path: "/construction-quantity-extractor",
+  // },
 ];
 
 const MainOptions = () => {

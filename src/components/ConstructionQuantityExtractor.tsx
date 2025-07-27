@@ -1,25 +1,39 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { Typography, Upload, Button, message, Checkbox } from "antd";
+import {
+  Typography,
+  Upload,
+  Button,
+  message,
+  Modal,
+  Radio,
+  Checkbox,
+  Table,
+  Divider,
+} from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-const { Title, Paragraph, Text } = Typography;
+
+const { Title } = Typography;
 
 const UploadSection = styled.div`
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 32px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
   background-color: #fff;
   width: 100%;
   height: 100%;
-  padding: 32px;
+  padding: 12px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
+`;
 
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
+const Box = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 500px;
 `;
 
 const Preview = styled.div`
@@ -41,38 +55,37 @@ const Preview = styled.div`
   }
 `;
 
-const ResponsiveDivider = styled.div`
-  width: 1px;
-  background-color: #eee;
-  margin: 0 16px;
-
-  @media (max-width: 768px) {
-    height: 1px;
-    width: 100%;
-    margin: 24px 0;
-  }
-`;
-
-const ResponseBox = styled.div`
-  margin-top: 32px;
-  padding: 16px;
-  background: #fafafa;
-  border-left: 4px solid #1890ff;
-  border-radius: 4px;
+const StyledTitle = styled(Title)`
+  margin: 0;
 `;
 
 const extractionOptions = [
-  "Quantity extraction for estimation",
-  "Quantity extraction for billing",
-  "Quantity extraction for material ordering",
+  { label: "אומדן", value: "basic" },
+  { label: "חשבון", value: "simple" },
+  { label: "כמויות", value: "calculated" },
 ];
+
+const elementOptions = Array.from({ length: 14 }, (_, i) => ({
+  label: `Option ${i}`,
+  value: i.toString(),
+}));
+
+const additionalOptions = Array.from({ length: 5 }, (_, i) => ({
+  label: `Option ${i}`,
+  value: i.toString(),
+}));
 
 const ConstructionQuantityExtractor = () => {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState<string>("");
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [selectedOption, setSelectedOption] = useState<string>("basic");
+  const [selectedElementOptions, setElementOptions] = useState<string[]>([]);
+  const [selectedAdditionalOptions, setSelectedAdditionalOptions] = useState<
+    string[]
+  >([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [tableData, setTableData] = useState<any>(null);
 
   const handleBeforeUpload = (file: File) => {
     if (file.type !== "application/pdf") {
@@ -92,7 +105,12 @@ const ConstructionQuantityExtractor = () => {
 
     const formData = new FormData();
     formData.append("pdf", file);
-    formData.append("options", JSON.stringify(selectedOptions));
+    formData.append("option", selectedOption);
+    formData.append("element_options", JSON.stringify(selectedElementOptions));
+    formData.append(
+      "additional_options",
+      JSON.stringify(selectedAdditionalOptions),
+    );
 
     try {
       setLoading(true);
@@ -103,8 +121,9 @@ const ConstructionQuantityExtractor = () => {
 
       if (!res.ok) throw new Error("Conversion failed");
 
-      const data = await res.json();
-      setResponse(data.result);
+      const json = await res.json();
+      setTableData(json);
+      setIsModalOpen(true);
     } catch (error) {
       console.error(error);
       message.error("Upload failed.");
@@ -113,23 +132,50 @@ const ConstructionQuantityExtractor = () => {
     }
   };
 
+  const columns =
+    tableData?.columns?.map((col: string, index: number) => ({
+      title: col,
+      dataIndex: `col_${index}`,
+      key: `col_${index}`,
+    })) || [];
+
+  const dataSource =
+    tableData?.rows?.map((row: string[], rowIndex: number) => {
+      const rowObj: any = { key: rowIndex };
+      row.forEach((cell, cellIndex) => {
+        rowObj[`col_${cellIndex}`] = cell;
+      });
+      return rowObj;
+    }) || [];
+
   return (
     <UploadSection>
-      <div style={{ flex: 2 }}>
-        <Title level={4} style={{ marginBottom: 16 }}>
-          Select extraction purpose(s):
-        </Title>
-        <Checkbox.Group
+      <Box>
+        <StyledTitle level={4}>מטרת השימוש:</StyledTitle>
+        <Radio.Group
           options={extractionOptions}
-          value={selectedOptions}
-          onChange={(list) => setSelectedOptions(list as string[])}
-          style={{ marginBottom: 24 }}
+          value={selectedOption}
+          onChange={(e) => setSelectedOption(e.target.value)}
+          optionType="button"
+          buttonStyle="solid"
         />
-        <Title level={3}>Upload a PDF File</Title>
-        <Paragraph>
-          Select a PDF file to preview it and upload it to the server.
-        </Paragraph>
+      </Box>
 
+      <Divider />
+
+      <Box>
+        <StyledTitle level={4}>בחירת אלמנטים מהתוכנית:</StyledTitle>
+        <Checkbox.Group
+          options={elementOptions}
+          value={selectedElementOptions}
+          onChange={(list) => setElementOptions(list as string[])}
+        />
+      </Box>
+
+      <Divider />
+
+      <Box>
+        <StyledTitle level={3}>Upload a PDF File</StyledTitle>
         <Upload
           beforeUpload={handleBeforeUpload}
           showUploadList={false}
@@ -143,11 +189,22 @@ const ConstructionQuantityExtractor = () => {
             <iframe title="PDF Preview" src={previewUrl} />
           </Preview>
         )}
-      </div>
+      </Box>
 
-      <ResponsiveDivider />
+      <Divider />
 
-      <div style={{ flex: 3 }}>
+      <Box>
+        <StyledTitle level={4}>הגדרות נוספות:</StyledTitle>
+        <Checkbox.Group
+          options={additionalOptions}
+          value={selectedAdditionalOptions}
+          onChange={(list) => setSelectedAdditionalOptions(list as string[])}
+        />
+      </Box>
+
+      <Divider />
+
+      <Box>
         <Button
           type="primary"
           onClick={handleUpload}
@@ -156,14 +213,17 @@ const ConstructionQuantityExtractor = () => {
         >
           Upload to Server
         </Button>
+      </Box>
 
-        {response && (
-          <ResponseBox>
-            <Text strong>Server Response:</Text>
-            <Paragraph>{response}</Paragraph>
-          </ResponseBox>
-        )}
-      </div>
+      <Modal
+        title="טבלת כמויות"
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        footer={null}
+        width="80%"
+      >
+        <Table dataSource={dataSource} columns={columns} pagination={false} />
+      </Modal>
     </UploadSection>
   );
 };
