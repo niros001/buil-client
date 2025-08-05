@@ -10,10 +10,13 @@ import {
   Checkbox,
   Divider,
   Input,
+  InputNumber,
+  Select,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 
 const { Title } = Typography;
+const { TextArea } = Input;
 
 const UploadSection = styled.div`
   display: flex;
@@ -91,6 +94,9 @@ const ConstructionQuantityExtractor = () => {
     string[]
   >([]);
   const [freeText, setFreeText] = useState<string>("");
+  const [dpi, setDpi] = useState<number>(200);
+  const [format, setFormat] = useState<"PNG" | "JPEG">("PNG");
+  const [quality, setQuality] = useState<number>(95);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tableData, setTableData] = useState<any>(null);
 
@@ -120,6 +126,13 @@ const ConstructionQuantityExtractor = () => {
     );
     formData.append("free_text", freeText);
 
+    // רק אם בחרת custom - נוסיף את הפרמטרים
+    if (selectedMainOption === "custom") {
+      formData.append("dpi", dpi.toString());
+      formData.append("format", format);
+      formData.append("quality", quality.toString());
+    }
+
     try {
       setLoading(true);
       const res = await fetch("https://buil-server.onrender.com/api/convert", {
@@ -139,23 +152,7 @@ const ConstructionQuantityExtractor = () => {
       setLoading(false);
     }
   };
-  //
-  // const columns =
-  //   tableData?.columns?.map((col: string, index: number) => ({
-  //     title: col,
-  //     dataIndex: `col_${index}`,
-  //     key: `col_${index}`,
-  //   })) || [];
-  //
-  // const dataSource =
-  //   tableData?.rows?.map((row: string[], rowIndex: number) => {
-  //     const rowObj: any = { key: rowIndex };
-  //     row.forEach((cell, cellIndex) => {
-  //       rowObj[`col_${cellIndex}`] = cell;
-  //     });
-  //     return rowObj;
-  //   }) || [];
-  console.log({ tableData });
+
   return (
     <UploadSection>
       <Box>
@@ -172,13 +169,60 @@ const ConstructionQuantityExtractor = () => {
       <Divider />
 
       {selectedMainOption === "custom" ? (
-        <Input.TextArea
-          showCount
-          maxLength={250}
-          onChange={({ target: { value } }) => setFreeText(value)}
-          placeholder="Custom question for AI"
-          style={{ height: 120, width: 500, resize: "none" }}
-        />
+        <>
+          <TextArea
+            showCount
+            maxLength={250}
+            onChange={({ target: { value } }) => setFreeText(value)}
+            placeholder="Custom question for AI"
+            style={{ height: 120, width: 500, resize: "none" }}
+          />
+
+          <Divider />
+
+          <Box>
+            <StyledTitle level={4}>הגדרות תמונה:</StyledTitle>
+
+            <label>
+              DPI:&nbsp;
+              <InputNumber
+                min={50}
+                max={600}
+                value={dpi}
+                onChange={(val) => setDpi(val || 200)}
+                style={{ width: 100 }}
+              />
+            </label>
+
+            <br />
+
+            <label>
+              פורמט:&nbsp;
+              <Select
+                value={format}
+                onChange={(val) => setFormat(val)}
+                style={{ width: 120 }}
+              >
+                <Select.Option value="PNG">PNG</Select.Option>
+                <Select.Option value="JPEG">JPEG</Select.Option>
+              </Select>
+            </label>
+
+            <br />
+
+            <label>
+              איכות 1-95 (quality, ל-JPEG בלבד):&nbsp;
+              <InputNumber
+                min={1}
+                max={95}
+                value={quality}
+                onChange={(val) => setQuality(val || 95)}
+                disabled={format === "PNG"}
+                style={{ width: 100 }}
+              />
+            </label>
+          </Box>
+        </>
       ) : (
         <>
           <Box>
