@@ -84,7 +84,8 @@ const ConstructionQuantityExtractor = () => {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedMainOption, setSelectedMainOption] = useState<string>("basic");
+  const [selectedMainOption, setSelectedMainOption] =
+    useState<string>("custom");
   const [selectedElementOptions, setElementOptions] = useState<string[]>([]);
   const [selectedAdditionalOptions, setSelectedAdditionalOptions] = useState<
     string[]
