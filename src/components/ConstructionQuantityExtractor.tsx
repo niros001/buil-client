@@ -63,10 +63,10 @@ const StyledTitle = styled(Title)`
 `;
 
 const mainOptions = [
-  { label: "אומדן", value: "basic" },
-  { label: "חשבון", value: "simple" },
-  { label: "כמויות", value: "calculated" },
-  { label: "הזמנת חומרים", value: "order_material" },
+  { label: "אומדן", value: "basic", disabled: true },
+  { label: "חשבון", value: "simple", disabled: true },
+  { label: "כמויות", value: "calculated", disabled: true },
+  { label: "הזמנת חומרים", value: "order_material", disabled: true },
   { label: "*", value: "custom" },
 ];
 
@@ -211,7 +211,7 @@ const ConstructionQuantityExtractor = () => {
             <br />
 
             <label>
-              איכות 1-95 (quality, ל-JPEG בלבד):&nbsp;
+              איכות (quality, ל-JPEG בלבד, טווח 1-95):&nbsp;
               <InputNumber
                 min={1}
                 max={95}
