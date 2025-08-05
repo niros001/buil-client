@@ -9,6 +9,7 @@ import {
   Radio,
   Checkbox,
   Divider,
+  Input,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 
@@ -58,11 +59,12 @@ const StyledTitle = styled(Title)`
   margin: 0;
 `;
 
-const extractionOptions = [
+const mainOptions = [
   { label: "אומדן", value: "basic" },
   { label: "חשבון", value: "simple" },
   { label: "כמויות", value: "calculated" },
   { label: "הזמנת חומרים", value: "order_material" },
+  { label: "*", value: "custom" },
 ];
 
 const elementOptions = [
@@ -82,11 +84,12 @@ const ConstructionQuantityExtractor = () => {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedOption, setSelectedOption] = useState<string>("basic");
+  const [selectedMainOption, setSelectedMainOption] = useState<string>("basic");
   const [selectedElementOptions, setElementOptions] = useState<string[]>([]);
   const [selectedAdditionalOptions, setSelectedAdditionalOptions] = useState<
     string[]
   >([]);
+  const [freeText, setFreeText] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tableData, setTableData] = useState<any>(null);
 
@@ -108,12 +111,13 @@ const ConstructionQuantityExtractor = () => {
 
     const formData = new FormData();
     formData.append("pdf", file);
-    formData.append("option", selectedOption);
+    formData.append("main_option", selectedMainOption);
     formData.append("element_options", JSON.stringify(selectedElementOptions));
     formData.append(
       "additional_options",
       JSON.stringify(selectedAdditionalOptions),
     );
+    formData.append("free_text", freeText);
 
     try {
       setLoading(true);
@@ -156,9 +160,9 @@ const ConstructionQuantityExtractor = () => {
       <Box>
         <StyledTitle level={4}>מטרת השימוש:</StyledTitle>
         <Radio.Group
-          options={extractionOptions}
-          value={selectedOption}
-          onChange={(e) => setSelectedOption(e.target.value)}
+          options={mainOptions}
+          value={selectedMainOption}
+          onChange={(e) => setSelectedMainOption(e.target.value)}
           optionType="button"
           buttonStyle="solid"
         />
@@ -166,14 +170,39 @@ const ConstructionQuantityExtractor = () => {
 
       <Divider />
 
-      <Box>
-        <StyledTitle level={4}>בחירת אלמנטים מהתוכנית:</StyledTitle>
-        <Checkbox.Group
-          options={elementOptions}
-          value={selectedElementOptions}
-          onChange={(list) => setElementOptions(list as string[])}
+      {selectedMainOption === "custom" ? (
+        <Input.TextArea
+          showCount
+          maxLength={250}
+          onChange={({ target: { value } }) => setFreeText(value)}
+          placeholder="Custom question for AI"
+          style={{ height: 120, width: 500, resize: "none" }}
         />
-      </Box>
+      ) : (
+        <>
+          <Box>
+            <StyledTitle level={4}>בחירת אלמנטים מהתוכנית:</StyledTitle>
+            <Checkbox.Group
+              options={elementOptions}
+              value={selectedElementOptions}
+              onChange={(list) => setElementOptions(list as string[])}
+            />
+          </Box>
+
+          <Divider />
+
+          <Box>
+            <StyledTitle level={4}>הגדרות נוספות:</StyledTitle>
+            <Checkbox.Group
+              options={additionalOptions}
+              value={selectedAdditionalOptions}
+              onChange={(list) =>
+                setSelectedAdditionalOptions(list as string[])
+              }
+            />
+          </Box>
+        </>
+      )}
 
       <Divider />
 
@@ -192,17 +221,6 @@ const ConstructionQuantityExtractor = () => {
             <iframe title="PDF Preview" src={previewUrl} />
           </Preview>
         )}
-      </Box>
-
-      <Divider />
-
-      <Box>
-        <StyledTitle level={4}>הגדרות נוספות:</StyledTitle>
-        <Checkbox.Group
-          options={additionalOptions}
-          value={selectedAdditionalOptions}
-          onChange={(list) => setSelectedAdditionalOptions(list as string[])}
-        />
       </Box>
 
       <Divider />
