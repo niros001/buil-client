@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Routes, Route } from "react-router-dom";
-import { Layout } from "antd";
+import { Layout, Modal } from "antd";
 import styled from "styled-components";
+import { useTranslation } from "react-i18next";
 import logo from "./assets/logo.svg";
 import { MainOptions, Page, ConstructionQuantityExtractor } from "./components";
 
@@ -16,6 +17,7 @@ const StyledHeader = styled(Header)`
   color: #fff;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 24px;
 `;
 
@@ -31,6 +33,15 @@ const LogoImg = styled.img`
   height: 50px;
 `;
 
+const LanguagesWrapper = styled.div`
+  display: flex;
+  gap: 5px;
+
+  span {
+    cursor: pointer;
+  }
+`;
+
 const StyledContent = styled(Content)``;
 
 const StyledFooter = styled(Footer)`
@@ -40,6 +51,21 @@ const StyledFooter = styled(Footer)`
 `;
 
 const MainPage: React.FC = () => {
+  const { i18n } = useTranslation();
+
+  const confirmAndChange = useCallback(
+    (lng: string) => {
+      Modal.confirm({
+        title: "Change Language",
+        content: "Are you sure you want to change the language?",
+        okText: "Yes",
+        cancelText: "No",
+        onOk: () => i18n.changeLanguage(lng),
+      });
+    },
+    [i18n],
+  );
+
   return (
     <StyledLayout>
       <StyledHeader>
@@ -47,6 +73,10 @@ const MainPage: React.FC = () => {
           <LogoImg src={logo} alt="BuilAI Logo" />
           Buil
         </Logo>
+        <LanguagesWrapper>
+          <span onClick={() => confirmAndChange("en")}>🇺🇸</span>
+          <span onClick={() => confirmAndChange("he")}>🇮🇱</span>
+        </LanguagesWrapper>
       </StyledHeader>
 
       <StyledContent>

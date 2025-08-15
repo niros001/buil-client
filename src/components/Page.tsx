@@ -1,5 +1,7 @@
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useTranslation } from "react-i18next";
 
 const Wrapper = styled.div`
   display: flex;
@@ -35,10 +37,11 @@ const Page = ({
   children: React.ReactNode;
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <Wrapper>
-      <BackButton onClick={() => navigate(-1)}>← Back</BackButton>
+      <BackButton onClick={() => navigate(-1)}>{t("back")}</BackButton>
       <Title>{title}</Title>
       {children}
     </Wrapper>
